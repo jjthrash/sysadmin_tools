@@ -68,6 +68,7 @@ RSSH=0                   # Install rssh restricted shell
 SCREEN=1                 # Install screen via apt-get
 SHOREWALL=1              # Install shorewall firewall via apt-get
 UNICORN=1                # Install Unicorn
+MONIT=0                  # Install monit
 
 # Prevent prompts during postfix installation
 export DEBIAN_FRONTEND=noninteractive
@@ -859,6 +860,13 @@ EOF
   fi
 }
 
+function install_monit() {
+  if [ "$MONIT" = 1 ]; then
+    display_message "Installing monit"
+    apt-get -y install monit
+  fi
+}
+
 function epilogue() {
   if [ "$SHOREWALL" = 1 ]; then
     cat <<EOF
@@ -922,6 +930,7 @@ create_user $USERNAME $PUBLIC_KEY_URL
 secure_ssh
 update_ubuntu
 apt_get_packages
+install_monit
 install_libyaml $LIBYAML_SOURCE
 install_ruby $RUBY_SOURCE
 install_gems
