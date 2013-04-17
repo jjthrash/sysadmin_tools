@@ -85,6 +85,9 @@ NGINX_SOURCE=http://nginx.org/download/nginx-1.2.7.tar.gz
 # To install Ruby, specify a url for source
 RUBY_SOURCE=http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p125.tar.gz
 
+# To install rubygems manually, specify a URL for source
+RUBYGEMS_SOURCE=https://rubyforge.org/frs/download.php/70696/rubygems-1.3.7.tgz
+
 # To install Trust Commerce's tclink API, specify a url for source
 TCLINK_SOURCE=https://vault.trustcommerce.com/downloads/tclink-3.4.4-ruby.tar.gz
 
@@ -514,6 +517,22 @@ function install_fail2ban() {
   /etc/init.d/fail2ban restart
 }
 
+function install_rubygems() {
+  local rubygems_source=$1
+
+  if [ $rubygems_source ]; then
+    display_message "Installing rubygems"
+    pushd /usr/local/src
+    wget $rubygems_source
+    local fname=$(file_name_from_path $rubygems_source)
+    tar xzf $fname
+    local prefix=${fname%\.tgz}
+    cd $prefix
+    ruby setup.rb
+    popd
+  fi
+}
+
 function install_gems() {
   if [ "$BUNDLER" = 1 ]; then
     display_message "Installing bundler gem"
@@ -933,6 +952,7 @@ apt_get_packages
 install_monit
 install_libyaml $LIBYAML_SOURCE
 install_ruby $RUBY_SOURCE
+install_rubygems $RUBYGEMS_SOURCE
 install_gems
 install_nginx $NGINX_SOURCE
 install_unicorn
